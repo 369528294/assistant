@@ -2,9 +2,9 @@
 
 这是你的一个超级助手，可以帮助你实现你的想法。
 
-## install
+## 安装
 
-配置你的 AI 模型，你可以在 [deepseek](https://www.deepseek.com/) 上注册一个账户。
+配置你的 AI 模型，你可以在 [deepseek](https://www.deepseek.com/) 上注册一个账户，并获取你的 [api_key](https://platform.deepseek.com/api_keys) 。
 
 ```sh
 cp .env.example .env
