@@ -1,6 +1,12 @@
 import importlib.util
 import json
 import re
+import os
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 
 # 检查指定的Python包是否已安装
 def check_package_installed(package_name):
@@ -75,3 +81,45 @@ def execute_command(command):
     except subprocess.CalledProcessError as e:
         return f"命令执行失败: {e}"
 
+# 发送邮件，多个文件时，file_path和file_name用半角逗号进行分割
+def send_email(subject, content, to, file_paths="", file_names=""):
+    try:
+        # 设置邮件
+        message = MIMEMultipart("mixed")  # 使用"mixed"类型来支持附件
+        message["Subject"] = subject
+        message["From"] = os.getenv('email_sendUser')
+        message["To"] = to
+
+        # 将HTML内容添加到邮件对象中
+        part2 = MIMEText(content, "html")
+        message.attach(part2)
+
+        # 添加附件
+        if file_paths:
+            file_paths_list = file_paths.split(',')  # 将文件路径字符串分割为列表
+            file_names_list = file_names.split(',')  # 将文件名字符串分割为列表
+
+            for file_path, file_name in zip(file_paths_list, file_names_list):
+                with open(file_path, "rb") as attachment:
+                    part = MIMEBase("application", "octet-stream")
+                    part.set_payload(attachment.read())
+
+                # 对附件进行编码
+                encoders.encode_base64(part)
+
+                # 添加附件头信息
+                part.add_header(
+                    "Content-Disposition",
+                    f"attachment; filename= {file_name}",
+                )
+
+                # 将附件添加到邮件对象中
+                message.attach(part)
+
+        # 发送邮件
+        with smtplib.SMTP_SSL(os.getenv('email_smtp_url'), os.getenv('email_smtp_port')) as server:
+            server.login(os.getenv('email_sendUser'), os.getenv('email_password'))
+            server.sendmail(os.getenv('email_sendUser'), [to], message.as_string())
+        return True
+    except Exception as e:
+        return True
