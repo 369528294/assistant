@@ -72,6 +72,9 @@ def chat_with_model():
                     elif command["action"] == "read_from_file":
                         result = tools.read_from_file(command["file_path"])
                         messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                    elif command["action"] == "wait_for_user_input":
+                        print("已执行任务，请进一步指示。")
+                        break
                     elif command["action"] == "exit":
                         print("成功执行了任务！")
                         break
