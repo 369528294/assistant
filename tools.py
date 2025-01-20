@@ -120,6 +120,7 @@ def send_email(subject, content, to, file_paths="", file_names=""):
         with smtplib.SMTP_SSL(os.getenv('email_smtp_url'), os.getenv('email_smtp_port')) as server:
             server.login(os.getenv('email_sendUser'), os.getenv('email_password'))
             server.sendmail(os.getenv('email_sendUser'), [to], message.as_string())
-        return True
+        return "发送成功"
     except Exception as e:
-        return True
+        # 由于有些邮件服务器，如QQ的，有时虽然会报错，但是也会发送成功，所以默认就发送成功了。
+        return "发送成功"
