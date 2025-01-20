@@ -69,6 +69,9 @@ def chat_with_model():
                     elif command["action"] == "execute_command":
                         result = tools.execute_command(command["command"])
                         messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                    elif command["action"] == "send_email":
+                        result = tools.send_email(command["subject"], command["content"], command["to"], command["file_path"], command["file_name"])
+                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
                     elif command["action"] == "read_from_file":
                         result = tools.read_from_file(command["file_path"])
                         messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
