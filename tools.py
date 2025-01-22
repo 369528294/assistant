@@ -1,3 +1,5 @@
+from pptx import Presentation
+from docx import Document
 import importlib.util
 import json
 import re
@@ -124,3 +126,65 @@ def send_email(subject, content, to, file_paths="", file_names=""):
     except Exception as e:
         # 由于有些邮件服务器，如QQ的，有时虽然会报错，但是也会发送成功，所以默认就发送成功了。
         return "发送成功"
+
+# 从PPT文件中提取文本内容。
+def extract_text_from_ppt(ppt_path):
+    """
+    从PPT文件中提取文本内容。
+
+    参数:
+        ppt_path (str): PPT文件的路径。
+
+    返回:
+        str: 提取的文本内容。
+    """
+    try:
+        # 加载PPT文件
+        prs = Presentation(ppt_path)
+
+        # 定义清理文本的函数
+        def clean_text(text):
+            illegal_xml_re = re.compile(u'[\x00-\x08\x0b\x0c\x0e-\x1F\uD800-\uDFFF\uFFFE\uFFFF]')
+            return illegal_xml_re.sub('', text)
+
+        # 遍历PPT中的每一页并提取文本
+        extracted_text = []
+        for slide in prs.slides:
+            for shape in slide.shapes:
+                if hasattr(shape, 'text'):
+                    cleaned_text = clean_text(shape.text)
+                    extracted_text.append(cleaned_text)
+
+        # 将所有文本合并为一个字符串
+        return "\n".join(extracted_text)
+
+    except Exception as e:
+        return f"读取PPT失败: {e}"
+
+# 从Word文档（.docx）中提取文本内容。
+def extract_text_from_docx(docx_path):
+    """
+    从Word文档（.docx）中提取文本内容。
+
+    参数:
+        docx_path (str): Word文档的路径。
+
+    返回:
+        str: 提取的文本内容。
+    """
+    try:
+        # 加载Word文档
+        doc = Document(docx_path)
+        print("Word文档加载成功。")
+
+        # 提取文档中的所有段落文本
+        extracted_text = []
+        for para in doc.paragraphs:
+            extracted_text.append(para.text)
+
+        # 将所有段落文本合并为一个字符串
+        return "\n".join(extracted_text)
+
+    except Exception as e:
+        print(f"读取Word文档失败: {e}")
+        return f"读取Word文档失败: {e}"
