@@ -4,6 +4,7 @@ import kimi
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 load_dotenv()
 
@@ -25,8 +26,9 @@ def chat_with_model():
     with open(ROLE, 'r', encoding='utf-8') as file:
         content = file.read()
     # 初始化消息历史
+    weekdays = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
     messages = [
-        {'role': 'system', 'content': content}
+        {'role': 'system', 'content': f"{content}。现在的时间是{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}，{weekdays[datetime.today().weekday()]}"}
     ]
 
     while True:
