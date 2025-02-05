@@ -1,5 +1,6 @@
 import traceback
 import tools
+import kimi
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
@@ -69,9 +70,24 @@ def chat_with_model():
                     elif command["action"] == "execute_command":
                         result = tools.execute_command(command["command"])
                         messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                    elif command["action"] == "send_email":
+                        result = tools.send_email(command["subject"], command["content"], command["to"], command.get("file_path", ""), command.get("file_name", ""))
+                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
                     elif command["action"] == "read_from_file":
                         result = tools.read_from_file(command["file_path"])
                         messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                    elif command["action"] == "extract_text_from_ppt":
+                        result = tools.extract_text_from_ppt(command["ppt_path"])
+                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                    elif command["action"] == "extract_text_from_docx":
+                        result = tools.extract_text_from_docx(command["docx_path"])
+                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                    elif command["action"] == "web_search":
+                        result = kimi.web_search(command["content"])
+                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                    elif command["action"] == "wait_for_user_input":
+                        print("已执行任务，请进一步指示。")
+                        break
                     elif command["action"] == "exit":
                         print("成功执行了任务！")
                         break

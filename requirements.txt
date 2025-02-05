@@ -1,5 +1,7 @@
 openai
 python-dotenv
+python-pptx
+python-docx
 ollama
 websockets
 pyautogui
