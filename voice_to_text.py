@@ -1,4 +1,6 @@
 import os
+import platform
+
 import websocket
 import datetime
 import hashlib
@@ -89,7 +91,7 @@ def reconnect(ws):
     """实现 WebSocket 重连机制"""
     print("Attempting to reconnect...")
     ws.close()
-    time.sleep(2)  # 等待2秒再重连
+    time.sleep(1)
     ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})  # 再次运行WebSocket
 
 
@@ -216,8 +218,14 @@ class SpeechToTextApp:
 
     def insert_text(self, text):
         pyperclip.copy(text)
-        pyautogui.hotkey('ctrl', 'v')
-        pyautogui.write(text)  # 在当前聚焦的文本框中写入文本
+        self.paste()
+
+    def paste(self):
+        """Simulates pressing the paste shortcut (Cmd+V on macOS, Ctrl+V on others)."""
+        if platform.system() == "Darwin":  # macOS
+            pyautogui.hotkey('command', 'v')
+        else:  # Windows/Linux
+            pyautogui.hotkey('ctrl', 'v')
 
     def on_closing(self):
         if self.ws:
