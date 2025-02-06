@@ -2,3 +2,9 @@ openai
 python-dotenv
 python-pptx
 python-docx
+ollama
+websockets
+pyautogui
+pyperclip
+websocket-client
+pyaudio
