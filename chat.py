@@ -1,6 +1,7 @@
 import traceback
 import tools
 import kimi
+import coze
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
@@ -39,10 +40,9 @@ def chat_with_model():
                 print("对话已结束。")
                 break
             count = 0
+            # 添加用户消息到对话历史
+            messages.append({'role': 'user', 'content': user_input})
             while True:
-                # 添加用户消息到对话历史
-                messages.append({'role': 'user', 'content': user_input})
-
                 # 调用模型，开启流式输出
                 stream = client.chat.completions.create(model=MODEL, messages=messages, stream=True)
                 print("助手: ", end="", flush=True)
@@ -65,28 +65,31 @@ def chat_with_model():
                         break
                     if command["action"] == "check_package_installed":
                         result = tools.check_package_installed(command["package_name"])
-                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                        messages.append({'role': 'assistant', 'content': f"已经成功执行{command['action']}方法，返回为{result}"})
                     elif command["action"] == "write_to_file":
                         result = tools.write_to_file(command["file_path"], command["content"])
-                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                        messages.append({'role': 'assistant', 'content': f"已经成功执行{command['action']}方法，返回为{result}"})
                     elif command["action"] == "execute_command":
                         result = tools.execute_command(command["command"])
-                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                        messages.append({'role': 'assistant', 'content': f"已经成功执行{command['action']}方法，返回为{result}"})
                     elif command["action"] == "send_email":
                         result = tools.send_email(command["subject"], command["content"], command["to"], command.get("file_path", ""), command.get("file_name", ""))
-                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                        messages.append({'role': 'assistant', 'content': f"已经成功执行{command['action']}方法，返回为{result}"})
                     elif command["action"] == "read_from_file":
                         result = tools.read_from_file(command["file_path"])
-                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                        messages.append({'role': 'assistant', 'content': f"已经成功执行{command['action']}方法，返回为{result}"})
                     elif command["action"] == "extract_text_from_ppt":
                         result = tools.extract_text_from_ppt(command["ppt_path"])
-                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                        messages.append({'role': 'assistant', 'content': f"已经成功执行{command['action']}方法，返回为{result}"})
                     elif command["action"] == "extract_text_from_docx":
                         result = tools.extract_text_from_docx(command["docx_path"])
-                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                        messages.append({'role': 'assistant', 'content': f"已经成功执行{command['action']}方法，返回为{result}"})
                     elif command["action"] == "web_search":
                         result = kimi.web_search(command["content"])
-                        messages.append({'role': 'user', 'content': f"我执行了{command['action']}命令，返回为{result}"})
+                        messages.append({'role': 'assistant', 'content': f"已经成功执行{command['action']}方法，返回为{result}"})
+                    elif command["action"] == "create_image":
+                        result = coze.create_image(command["image_prompt"], command["file_path"])
+                        messages.append({'role': 'assistant', 'content': f"已经成功执行{command['action']}方法，返回为{result}"})
                     elif command["action"] == "wait_for_user_input":
                         print("已执行任务，请进一步指示。")
                         break
@@ -95,6 +98,8 @@ def chat_with_model():
                         break
                     else:
                         messages.append({'role': 'user', 'content': f"我不太明白你的意思，没有找到具体的指令。请重新回答。你可以自己通过写python文件执行你自己的指令。"})
+                    # 以用户的口吻提醒模型继续执行。
+                    messages.append({'role': 'user', 'content': f"好的，请根据执行结果判断是否继续执行或者终止。"})
                 except Exception as e:
                     print(f"发生错误: {e}")
                     if count>=10:
