@@ -8,3 +8,4 @@ pyautogui
 pyperclip
 websocket-client
 pyaudio
+cozepy
